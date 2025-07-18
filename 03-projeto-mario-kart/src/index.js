@@ -126,17 +126,17 @@ async function playRaceEngine(character1, character2) {
       );
     }
     
-    // sortear perda por Casco ou Bomba
-          let loser = await getRandomLoser();
-          console.log(`Perda: ${loser}`);
-          // Sorteia aleatóriamente o turbo 
-          let turbo = await getRandomTurbo();
-          console.log(`Turbo: ${turbo}`);
+   
     
     if (block === "CONFRONTO") {
       let powerResult1 = diceResult1 + character1.PODER;
       let powerResult2 = diceResult2 + character2.PODER;
-
+      // sortear perda por Casco ou Bomba
+      let loser = await getRandomLoser();
+      console.log(`Perda: ${loser}`);
+      // Sorteia aleatóriamente o turbo 
+      let turbo = await getRandomTurbo();
+      console.log(`Turbo: ${turbo}`);
       console.log(`${character1.NOME} confrontou com ${character2.NOME}! 🥊`);
       await logRollResult(
         character1.NOME,
