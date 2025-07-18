@@ -4,6 +4,8 @@ const player1 = {
   MANOBRABILIDADE: 3,
   PODER: 3,
   PONTOS: 0,
+  CASCO: 1,
+  BOMBA: 2,
 };
 
 const player2 = {
@@ -12,6 +14,8 @@ const player2 = {
   MANOBRABILIDADE: 4,
   PODER: 4,
   PONTOS: 0,
+  CASCO: 1,
+  BOMBA: 2,
 };
 
 async function rollDice() {
@@ -35,10 +39,35 @@ async function getRandomBlock() {
 
   return result;
 }
+async function getRandomLoser() {
+  let random = Math.random();
+  let result;
+
+  if (random < 0.5){
+    result = "CASCO";
+  } else {
+    result = "BOMBA";
+  }
+
+  return result;
+}
+
+async function getRandomTurbo() {
+  let random = Math.random();
+  let result;
+
+  if (random < 0.5){
+    result = "SIM";
+  } else {
+    result = "NAO";
+  }
+
+  return result;
+}
 
 async function logRollResult(characterName, block, diceResult, attribute) {
   console.log(
-    `${characterName} 🎲 rolou um dado de ${block} ${diceResult} + ${attribute} = ${
+    `${characterName} 🎲 rolou um dado de ${block} (🎲 ${diceResult}) + ${attribute} = ${
       diceResult + attribute
     }`
   );
@@ -51,7 +80,7 @@ async function playRaceEngine(character1, character2) {
     // sortear bloco
     let block = await getRandomBlock();
     console.log(`Bloco: ${block}`);
-
+    
     // rolar os dados
     let diceResult1 = await rollDice();
     let diceResult2 = await rollDice();
@@ -116,35 +145,74 @@ async function playRaceEngine(character1, character2) {
         "poder",
         diceResult2,
         character2.PODER
-      );
+      ); 
+      
+      // sortear perda por Casco ou Bomba
+      let loser = await getRandomLoser();
+      console.log(`Perda: ${loser}`);
+      // Sorteia aleatóriamente o turbo 
+      let turbo = await getRandomTurbo();
+      console.log(`Turbo: ${turbo}`);
 
-      if (powerResult1 > powerResult2 && character2.PONTOS > 0) {
+      if (powerResult1 > powerResult2 && character2.PONTOS - character2[loser]> 0) {
         console.log(
-          `${character1.NOME} venceu o confronto! ${character2.NOME} perdeu 1 ponto 🐢`
+          `${character1.NOME} venceu o confronto! ${character2.NOME} perdeu ${character2[loser]} ponto(s)`
+           
+        )
+
+        if (character2[loser] == 1); {
+          character2.PONTOS = character2.PONTOS - 1;
+        };
+
+        if (character2[loser] == 2); {
+          character2.PONTOS = character2.PONTOS - 2;
+        };
+
+         if (turbo == "SIM") {
+          console.log(`${character1.NOME} Recebeu 1 ponto turbo!`);
+          character1.PONTOS++;
+        }
+      } 
+      
+      
+       
+
+      if (powerResult2 > powerResult1 && character1.PONTOS - character1[loser] > 0) {
+        console.log(
+          `${character2.NOME} venceu o confronto! ${character1.NOME} perdeu ${character2[loser]} ponto(s)`
         );
-        character2.PONTOS--;
+        if (character1[loser] == 1); {
+          character1.PONTOS = character1.PONTOS - 1;
+        };
+
+        if (character1[loser] == 2); {
+          character1.PONTOS = character1.PONTOS - 2;
+        };
+        
+      
+        if (turbo == "SIM") {
+          console.log(`${character2.NOME} Recebeu 1 ponto turbo!`);
+          character1.PONTOS++;
+        }
+     
       }
 
-      if (powerResult2 > powerResult1 && character1.PONTOS > 0) {
-        console.log(
-          `${character2.NOME} venceu o confronto! ${character1.NOME} perdeu 1 ponto 🐢`
-        );
-        character1.PONTOS--;
-      }
+        
 
       console.log(
         powerResult2 === powerResult1
-          ? "Confronto empatado! Nenhum ponto foi perdido"
+          ? "Confronto empatado! Nenhum ponto foi perdido ou ganho"
           : ""
       );
+    
     }
 
     // verificando o vencedor
     if (totalTestSkill1 > totalTestSkill2) {
-      console.log(`${character1.NOME} marcou um ponto!`);
+      console.log(`${character1.NOME} marcou +1 ponto!`);
       character1.PONTOS++;
     } else if (totalTestSkill2 > totalTestSkill1) {
-      console.log(`${character2.NOME} marcou um ponto!`);
+      console.log(`${character2.NOME} marcou +1 ponto!`);
       character2.PONTOS++;
     }
 
